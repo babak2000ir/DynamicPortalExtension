@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<WebServicePublishing>
+  <Services>
+    <Service>
+      <ObjectType>Codeunit</ObjectType>
+      <ObjectID>60000</ObjectID>
+      <ServiceName>nFormPOCWS</ServiceName>
+      <ServiceType>SOAP</ServiceType>
+    </Service>
+  </Services>
+</WebServicePublishing>

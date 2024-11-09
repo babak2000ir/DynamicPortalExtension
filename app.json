@@ -1,0 +1,32 @@
+{
+  "id": "71527bd7-844b-417a-911b-af5327d08eb4",
+  "name": "PortalPOC",
+  "publisher": "Transperen",
+  "version": "25.0.1.1",
+  "brief": "nFormPOC Portal Extension",
+  "description": "",
+  "privacyStatement": "",
+  "EULA": "",
+  "help": "",
+  "url": "",
+  "logo": "",
+  "dependencies": [],
+  "screenshots": [],
+  "platform": "25.0.0.0",
+  "application": "25.0.0.0",
+  "idRanges": [
+    {
+      "from": 60000,
+      "to": 60049
+    }
+  ],
+  "resourceExposurePolicy": {
+    "allowDebugging": true,
+    "allowDownloadingSource": true,
+    "includeSourceInSymbolFile": true
+  },
+  "runtime": "14.0",
+  "features": [
+    "NoImplicitWith"
+  ]
+}

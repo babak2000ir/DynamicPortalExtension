@@ -1,0 +1,14 @@
+{
+    "al.editorServicesLogLevel": "Verbose",
+    "CRS.AlSubFolderName": "src",
+    //"CRS.DisableCRSSnippets": true,
+    //TPEEntityMgmt.Codeunit.al
+    "CRS.FileNamePattern": "<ObjectNameShort>.<ObjectType>.al",
+    "CRS.FileNamePatternExtensions": "<ObjectName>(<BaseName>) [Ext<ObjectId>].al",
+    "CRS.FileNamePatternPageCustomizations": "<ObjectName>(<BaseName>) [Cust<ObjectId>].al",
+    //"CRS.RenameWithGit": true,
+    "CRS.OnSaveAlFileAction": "Reorganize",
+    "al.codeAnalyzers": ["${CodeCop}"],
+    "al.backgroundCodeAnalysis": true,
+    "al.enableCodeAnalysis": true
+}

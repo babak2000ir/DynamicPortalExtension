@@ -1,0 +1,40 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Attach: Web Prototype nFormPOC",
+            "type": "al",
+            "request": "attach",
+            "server": "http://businesscentral.dynamics.com/",
+            "authentication": "AAD",
+            "environmentType": "Sandbox",
+            "environmentName": "ScriptSandbox",
+            "tenant": "c77f7dff-d01a-4ebf-b79c-1ce2d28f7847",
+            "breakOnError": true,
+            "breakOnRecordWrite": "None",
+            "enableSqlInformationDebugger": true,
+            "enableLongRunningSqlStatements": true,
+            "longRunningSqlStatementsThreshold": 500,
+            "numberOfSqlStatements": 10,
+            "breakOnNext": "WebServiceClient",
+            "userId": "127270ef-7efc-4507-bd06-329d9b9cbe48"
+        },
+        {
+            "name": "Web Prototype nFormPOC",
+            "request": "launch",
+            "type": "al",
+            "server": "http://businesscentral.dynamics.com/",
+            "authentication": "AAD",
+            "environmentType": "Sandbox",
+            "environmentName": "ScriptSandbox",
+            "tenant": "c77f7dff-d01a-4ebf-b79c-1ce2d28f7847",
+            "startupObjectId": 60000,
+            "startupObjectType": "Page",
+            "breakOnError": true,
+            "launchBrowser": false,
+            "enableLongRunningSqlStatements": true,
+            "enableSqlInformationDebugger": true,
+            "schemaUpdateMode": "ForceSync"
+        }
+    ]
+}
