@@ -1,4 +1,4 @@
-codeunit 60002 "TNP Portal User Management"
+codeunit 60002 "TPE Portal User Management"
 {
     var
         CrptographyMgmt: Codeunit "Cryptography Management";

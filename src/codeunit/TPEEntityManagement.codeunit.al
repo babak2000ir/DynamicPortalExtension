@@ -1,4 +1,4 @@
-codeunit 60001 "TNP Entity Mgmt."
+codeunit 60001 "TPE Entity Management"
 {
 
     procedure GetFieldFilter(pTableNo: Integer; EntityCode: Code[20]; var FilterString: Text)
@@ -288,5 +288,13 @@ codeunit 60001 "TNP Entity Mgmt."
                     lFieldRef.SetFilter('=%1', lValue);
             end;
         end;
+    end;
+
+    procedure IsPrimaryKey(TableNo: Integer; FieldNo: Integer): Boolean
+    var
+        Field: Record Field;
+    begin
+        if Field.Get(TableNo, FieldNo) and Field.IsPartOfPrimaryKey then
+            exit(true);
     end;
 }

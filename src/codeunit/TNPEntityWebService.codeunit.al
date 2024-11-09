@@ -2,8 +2,8 @@ codeunit 60000 "TNP Entity Web Service"
 {
 
     var
-        EntityMgmt: Codeunit "TNP Entity Mgmt.";
-        PortalUserMgmt: Codeunit "TNP Portal User Management";
+        EntityMgmt: Codeunit "TPE Entity Management";
+        PortalUserMgmt: Codeunit "TPE Portal User Management";
         TechnicalOptionTxt: TextConst ENU = '%1';
         UserNotFoundSecureErr: Label 'Invalid credentials. The password is incorrect or no registered user was found for the provided user email.';
     #Region Interface
@@ -41,8 +41,8 @@ codeunit 60000 "TNP Entity Web Service"
         lEntity: Record "TNP Entity Header";
     begin
         if lEntity.Get(pEntityCode) then
-            WriteData(lEntity."Table ID", lEntity, pAmendType, pRecord, pIDFilterString);
-        exit(EntityDataAmendLocal(pAmendType));
+            this.WriteData(lEntity."Table ID", lEntity, pAmendType, pRecord, pIDFilterString);
+        exit(this.EntityDataAmendLocal(pAmendType));
     end;
 
     procedure TableDataAmend(pTableNo: Integer; pAmendType: Text; pRecord: Text; pIDFilterString: Text): Text
@@ -500,27 +500,27 @@ codeunit 60000 "TNP Entity Web Service"
 
                     if InsertAfterPK then
                         // EntityMgmt.InitSetKeys(lRecordRef, pEntity."Entity Code", lJAFieldValue);
-                        EntityMgmt.InsertOp(lRecordRef, InsertTrigger);
-                    EntityMgmt.SetFields(lRecordRef, pEntity."Entity Code", pTableNo, lJAFieldValue, pIDFilterString);
+                        this.EntityMgmt.InsertOp(lRecordRef, InsertTrigger);
+                    this.EntityMgmt.SetFields(lRecordRef, pEntity."Entity Code", pTableNo, lJAFieldValue, pIDFilterString);
                     if InsertAfterPK then
-                        EntityMgmt.ModifyOp(lRecordRef, ModifyTriggerOnInsert)
+                        this.EntityMgmt.ModifyOp(lRecordRef, ModifyTriggerOnInsert)
                     else
-                        EntityMgmt.InsertOp(lRecordRef, InsertTrigger);
+                        this.EntityMgmt.InsertOp(lRecordRef, InsertTrigger);
                 end;
             'Modify':
                 begin
                     if not ModifyAllowed then Error('Modify not allowed for entity %1', pEntity."Entity Code");
-                    EntityMgmt.SearchKeys(lRecordRef, pTableNo, lJAFieldValue);
-                    EntityMgmt.FindOp(lRecordRef);
-                    EntityMgmt.SetFields(lRecordRef, pEntity."Entity Code", pTableNo, lJAFieldValue, pIDFilterString);
-                    EntityMgmt.ModifyOp(lRecordRef, ModifyTriggerOnModify);
+                    this.EntityMgmt.SearchKeys(lRecordRef, pTableNo, lJAFieldValue);
+                    this.EntityMgmt.FindOp(lRecordRef);
+                    this.EntityMgmt.SetFields(lRecordRef, pEntity."Entity Code", pTableNo, lJAFieldValue, pIDFilterString);
+                    this.EntityMgmt.ModifyOp(lRecordRef, ModifyTriggerOnModify);
                 end;
             'Delete':
                 begin
                     if not DeleteAllowed then Error('Delete not allowed for entity %1', pEntity."Entity Code");
-                    EntityMgmt.SearchKeys(lRecordRef, pTableNo, lJAFieldValue);
-                    EntityMgmt.FindOp(lRecordRef);
-                    EntityMgmt.DeleteOp(lRecordRef, DeleteTrigger);
+                    this.EntityMgmt.SearchKeys(lRecordRef, pTableNo, lJAFieldValue);
+                    this.EntityMgmt.FindOp(lRecordRef);
+                    this.EntityMgmt.DeleteOp(lRecordRef, DeleteTrigger);
                 end;
         end;
     end;

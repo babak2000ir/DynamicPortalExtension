@@ -17,7 +17,7 @@
             "longRunningSqlStatementsThreshold": 500,
             "numberOfSqlStatements": 10,
             "breakOnNext": "WebServiceClient",
-            "userId": "127270ef-7efc-4507-bd06-329d9b9cbe48"
+            "userId": "{600fabef-b73a-47c0-b812-0a1af99b0827}"
         },
         {
             "name": "Web Prototype nFormPOC",

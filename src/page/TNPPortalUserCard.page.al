@@ -64,7 +64,7 @@ page 60005 "TNP Portal User Card"
 
                 trigger OnAction()
                 var
-                    PortalUserMgmt: Codeunit "TNP Portal User Management";
+                    PortalUserMgmt: Codeunit "TPE Portal User Management";
                 begin
                     PortalUserMgmt.CreatePasswordManually(Rec);
                 end;

@@ -76,22 +76,16 @@ table 60001 "TNP Entity Field"
         }
     }
 
+    var
+        EntityMgmt: Codeunit "TPE Entity Management";
+
     trigger OnInsert()
     var
-        field: Record Field;
-        lEntity: Record "TNP Entity Header";
+        Entity: Record "TNP Entity Header";
     begin
-        if "Field ID" <> 0 then begin
-            field.Reset();
-            field.SetRange(IsPartOfPrimaryKey, true);
-            if lEntity.Get(Rec."Entity Code") then begin
-                lEntity.Get(Rec."Entity Code");
-                field.Setrange(TableNo, lEntity."Table ID");
-            end;
-            if not field.IsEmpty() then begin
-                Rec."Primary Key" := true;
-                Rec."Read Only" := true;
-            end;
+        if Entity.Get(Rec."Entity Code") and this.EntityMgmt.IsPrimaryKey(Entity."Table ID", Rec."Field ID") then begin
+            Rec."Primary Key" := true;
+            Rec."Read Only" := true;
         end;
     end;
 }
