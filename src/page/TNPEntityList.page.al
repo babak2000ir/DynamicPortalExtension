@@ -23,6 +23,11 @@ page 60000 "TNP Entity List"
                 {
                     ToolTip = 'Specifies the value of the Table ID field.';
                     ApplicationArea = All;
+
+                    trigger OnValidate()
+                    begin
+                        CurrPage.Update(false);
+                    end;
                 }
                 field("Table Name"; Rec."Table Name")
                 {

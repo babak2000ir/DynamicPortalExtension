@@ -498,8 +498,9 @@ codeunit 60000 "TNP Entity Web Service"
                 begin
                     if not InsertAllowed then Error('Insert not allowed for entity %1', pEntity."Entity Code");
 
+                    EntityMgmt.InitSetKeys(lRecordRef, pEntity."Entity Code", lJAFieldValue);
+
                     if InsertAfterPK then
-                        // EntityMgmt.InitSetKeys(lRecordRef, pEntity."Entity Code", lJAFieldValue);
                         this.EntityMgmt.InsertOp(lRecordRef, InsertTrigger);
                     this.EntityMgmt.SetFields(lRecordRef, pEntity."Entity Code", pTableNo, lJAFieldValue, pIDFilterString);
                     if InsertAfterPK then

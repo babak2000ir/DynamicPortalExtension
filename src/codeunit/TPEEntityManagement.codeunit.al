@@ -87,13 +87,14 @@ codeunit 60001 "TPE Entity Management"
         lEntityFields.Reset();
         lEntityFields.SetRange("Entity Code", pEntityCode);
         lEntityFields.SetRange("Primary Key", true);
+        lEntityFields.SetRange("Read Only", false);
         if lEntityFields.FindSet() then
             repeat
                 lFieldRef := pRecordRef.Field(lEntityFields."Field ID");
                 valueQuery := '[?(@.id==''' + Format(lEntityFields."Field ID") + ''')].value';
                 typeQuery := '[?(@.id==''' + Format(lEntityFields."Field ID") + ''')].type';
                 pJAFieldValue.SelectToken(valueQuery, lJTFieldValue);
-                convertJsonValueToFieldType(pJAFieldValue, lFieldRef, lJTFieldValue, typeQuery);
+                this.convertJsonValueToFieldType(pJAFieldValue, lFieldRef, lJTFieldValue, typeQuery);
             until lEntityFields.Next() = 0;
     end;
 
@@ -119,7 +120,7 @@ codeunit 60001 "TPE Entity Management"
                     valueQuery := '[?(@.id==''' + Format(lEntityFields."Field ID") + ''')].value';
                     typeQuery := '[?(@.id==''' + Format(lEntityFields."Field ID") + ''')].type';
                     pJAFieldValue.SelectToken(valueQuery, lJTFieldValue);
-                    convertJsonValueToFieldType(pJAFieldValue, lFieldRef, lJTFieldValue, typeQuery);
+                    this.convertJsonValueToFieldType(pJAFieldValue, lFieldRef, lJTFieldValue, typeQuery);
                 until lEntityFields.Next() = 0;
         end
         else begin
@@ -134,7 +135,7 @@ codeunit 60001 "TPE Entity Management"
                     valueQuery := '[?(@.id==''' + Format(field."No.") + ''')].value';
                     typeQuery := '[?(@.id==''' + Format(field."No.") + ''')].type';
                     if pJAFieldValue.SelectToken(valueQuery, lJTFieldValue) then
-                        convertJsonValueToFieldType(pJAFieldValue, lFieldRef, lJTFieldValue, typeQuery);
+                        this.convertJsonValueToFieldType(pJAFieldValue, lFieldRef, lJTFieldValue, typeQuery);
                 until field.Next() = 0;
         end;
     end;
@@ -239,7 +240,7 @@ codeunit 60001 "TPE Entity Management"
                 valueQuery := '[?(@.id==''' + Format(field."No.") + ''')].value';
                 typeQuery := '[?(@.id==''' + Format(field."No.") + ''')].type';
                 pJAFieldValue.SelectToken(valueQuery, lJTFieldValue);
-                findRecordByKeys(pJAFieldValue, lFieldRef, lJTFieldValue, typeQuery);
+                this.findRecordByKeys(pJAFieldValue, lFieldRef, lJTFieldValue, typeQuery);
             until field.Next() = 0;
     end;
 
