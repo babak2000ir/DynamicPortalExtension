@@ -2,8 +2,6 @@ page 60002 "Entity Related List"
 {
     Caption = 'PageName';
     PageType = List;
-    UsageCategory = Lists;
-    ApplicationArea = All;
     SourceTable = "TNP Entity Related Table";
 
     layout

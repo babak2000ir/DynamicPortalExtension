@@ -83,7 +83,9 @@ table 60001 "TNP Entity Field"
     var
         Entity: Record "TNP Entity Header";
     begin
-        if Entity.Get(Rec."Entity Code") and this.EntityMgmt.IsPrimaryKey(Entity."Table ID", Rec."Field ID") then begin
+        if Entity.Get(Rec."Entity Code") and
+                    (this.EntityMgmt.IsPrimaryKey(Entity."Table ID", Rec."Field ID") or
+                    this.EntityMgmt.isFlowField(Entity."Table ID", Rec."Field ID")) then begin
             Rec."Primary Key" := true;
             Rec."Read Only" := true;
         end;

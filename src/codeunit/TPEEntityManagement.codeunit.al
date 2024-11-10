@@ -298,4 +298,12 @@ codeunit 60001 "TPE Entity Management"
         if Field.Get(TableNo, FieldNo) and Field.IsPartOfPrimaryKey then
             exit(true);
     end;
+
+    procedure isFlowField(TableNo: Integer; FieldNo: Integer): Boolean
+    var
+        Field: Record Field;
+    begin
+        if Field.Get(TableNo, FieldNo) and (Field.Class = Field.Class::FlowField) then
+            exit(true);
+    end;
 }

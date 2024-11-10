@@ -153,6 +153,8 @@ page 60000 "TNP Entity List"
                 RunPageLink = "Entity Code" = field("Entity Code");
                 PromotedIsBig = true;
             }
+
+            //TODO: Add action for Entity Filter
         }
     }
 
