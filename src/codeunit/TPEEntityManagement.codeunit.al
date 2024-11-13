@@ -221,14 +221,17 @@ codeunit 60001 "TPE Entity Management"
         if (lRecordCount mod pPageSize) > 0 then
             pPageCount += 1;
 
+        if pPageIndex > pPageCount then
+            exit;
+
         lintCounter := 1;
         lRecordRef.FindSet();
         if pPageIndex > 1 then
-            if lRecordRef.next((pPageIndex - 1) * pPageSize + 1) > 0 then
+            if lRecordRef.next((pPageIndex - 1) * pPageSize) > 0 then
                 repeat
                     pJARecords.Add(this.GetEntityFieldValues(pEntityCode, lRecordRef));
                     lintCounter += 1;
-                until (lRecordRef.Next() = 0) or (lintCounter > pPageSize);
+                until (lRecordRef.Next() = 0) or (lintCounter > pPageSize + 1);
         if pPageIndex = 1 then
             repeat
                 pJARecords.Add(this.GetEntityFieldValues(pEntityCode, lRecordRef));
