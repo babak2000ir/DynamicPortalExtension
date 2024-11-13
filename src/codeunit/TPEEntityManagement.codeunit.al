@@ -166,13 +166,13 @@ codeunit 60001 "TPE Entity Management"
         exit(lJOField);
     end;
 
-    procedure GetEntityData(pEntityCode: Code[20]; pView: Text; pPageIndex: Integer; pFilterParams: Text; pRelatedEntityCode: Code[20]) JOResult: JsonObject
+    procedure GetEntityData(pEntityCode: Code[20]; pView: Text; pPageSize: Integer; pPageIndex: Integer) JOResult: JsonObject
     var
         lPageCount: Integer;
         lJARecords: JsonArray;
         lJAPaging, lJOData : JsonObject;
     begin
-        this.GetEntityRecords(pEntityCode, pView, lJARecords, pPageIndex, lPageCount, pFilterParams, pRelatedEntityCode);
+        this.GetEntityRecords(pEntityCode, pView, lJARecords, pPageSize, pPageIndex, lPageCount);
 
         lJAPaging.Add('pageIndex', pPageIndex);
         lJAPaging.Add('pageCount', lPageCount);
@@ -183,19 +183,15 @@ codeunit 60001 "TPE Entity Management"
         JOResult.Add('data', lJOData);
     end;
 
-    procedure GetEntityRecords(pEntityCode: Code[20]; pView: Text; var pJARecords: JsonArray; pPageIndex: Integer; var pPageCount: Integer; pFilterParams: Text; pRelatedEntityCode: Code[20])
+    procedure GetEntityRecords(pEntityCode: Code[20]; pView: Text; var pJARecords: JsonArray; pPageSize: integer; pPageIndex: Integer; var pPageCount: Integer)
     var
-        lEntityRelationFilter: record "TNP Ent. Rel. Table Filter";
         lRecordRef: RecordRef;
-        lFieldRef: FieldRef;
         lintCounter: Integer;
-        lPageSize: Integer;
         lTableId: Integer;
-        valueQuery: Text;
-        lJTFieldValue: JsonToken;
-        lJFilterValue: JsonArray;
+        lRecordCount: Integer;
     begin
-        lPageSize := 10;
+        if pPageSize < 1 then
+            pPageSize := 10;
 
         Clear(pJARecords);
 
@@ -206,35 +202,38 @@ codeunit 60001 "TPE Entity Management"
             lRecordRef.SetView(pView);
 
         // Filter BY RelationFilter Field ID
-        lJFilterValue.ReadFrom(pFilterParams);
-        if lJFilterValue.Count > 0 then begin
-            lEntityRelationFilter.Reset();
-            lEntityRelationFilter.SetRange("Entity Code", pRelatedEntityCode);
-            lEntityRelationFilter.SetRange("Related Table ID", lTableId);
-            if lEntityRelationFilter.FindSet() then
-                repeat
-                    lFieldRef := lRecordRef.Field(lEntityRelationFilter."Related Table Field ID");
-                    valueQuery := '[?(@.id==''' + Format(lEntityRelationFilter."Related Table Field ID") + ''')].value';
-                    lJFilterValue.SelectToken(valueQuery, lJTFieldValue);
-                    lFieldRef.SetFilter(lJTFieldValue.AsValue().AsText());
-                until lEntityRelationFilter.Next() = 0;
-        end;
+        /* if lJFilterValue.ReadFrom(pFilterParams) then
+            if lJFilterValue.Count > 0 then begin
+                lEntityRelationFilter.Reset();
+                lEntityRelationFilter.SetRange("Entity Code", pRelatedEntityCode);
+                lEntityRelationFilter.SetRange("Related Table ID", lTableId);
+                if lEntityRelationFilter.FindSet() then
+                    repeat
+                        lFieldRef := lRecordRef.Field(lEntityRelationFilter."Related Table Field ID");
+                        valueQuery := '[?(@.id==''' + Format(lEntityRelationFilter."Related Table Field ID") + ''')].value';
+                        lJFilterValue.SelectToken(valueQuery, lJTFieldValue);
+                        lFieldRef.SetFilter(lJTFieldValue.AsValue().AsText());
+                    until lEntityRelationFilter.Next() = 0;
+            end; */
 
-        pPageCount := (lrecordRef.Count() div lPageSize) + 1;
+        lRecordCount := lRecordRef.Count();
+        pPageCount := (lRecordCount div pPageSize);
+        if (lRecordCount mod pPageSize) > 0 then
+            pPageCount += 1;
 
         lintCounter := 1;
         lRecordRef.FindSet();
         if pPageIndex > 1 then
-            if lRecordRef.next((pPageIndex - 1) * lPageSize) <> 0 then
+            if lRecordRef.next((pPageIndex - 1) * pPageSize + 1) > 0 then
                 repeat
                     pJARecords.Add(this.GetEntityFieldValues(pEntityCode, lRecordRef));
                     lintCounter += 1;
-                until (lRecordRef.Next() = 0) or (lintCounter > lPageSize);
+                until (lRecordRef.Next() = 0) or (lintCounter > pPageSize);
         if pPageIndex = 1 then
             repeat
                 pJARecords.Add(this.GetEntityFieldValues(pEntityCode, lRecordRef));
                 lintCounter += 1;
-            until (lRecordRef.Next() = 0) or (lintCounter > lPageSize);
+            until (lRecordRef.Next() = 0) or (lintCounter > pPageSize);
     end;
 
     procedure GetEntityFieldValues(pEntityCode: Code[20]; pRecordRef: RecordRef): JsonArray
