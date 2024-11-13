@@ -8,22 +8,26 @@ codeunit 60001 "TPE Entity Management"
     var
         Entities: Record "TNP Entity Header";
         lAllObjWithCaption: Record AllObjWithCaption;
-        lEntityTableFilter: Text;
         lJAEntities: JsonArray;
         lJOEntity: JsonObject;
+        TableIdsList: List of [Integer];
+        lJARelations: JsonArray;
     begin
+        Clear(TableIdsList);
+
         Entities.Reset();
         Entities.SetAutoCalcFields("Table Name");
         if Entities.FindSet(false) then
             repeat
-                if lEntityTableFilter = '' then
-                    lEntityTableFilter := Format(Entities."Table ID")
-                else
-                    lEntityTableFilter += '|' + Format(Entities."Table ID");
+                TableIdsList.Add(Entities."Table ID");
 
                 Clear(lJOEntity);
                 this.GetTable(Entities."Entity Code", Entities."Table ID", Entities."Table Name", Entities."Entity Name", Entities."Insert Allowed", Entities."Modify Allowed", Entities."Delete Allowed", lJOEntity);
-                lJOEntity.Add('relations', this.GetTableRelations(Entities."Entity Code"));
+
+                lJARelations := this.GetTableRelations(Entities."Entity Code");
+                if lJARelations.Count > 0 then
+                    lJOEntity.Add('relations', lJARelations);
+
                 lJAEntities.Add(lJOEntity);
             until Entities.Next() = 0;
 
@@ -32,7 +36,8 @@ codeunit 60001 "TPE Entity Management"
         lAllObjWithCaption.SetRange("Object Subtype", 'Normal');
         if lAllObjWithCaption.FindSet() then
             repeat
-                if StrPos(lEntityTableFilter, Format(lAllObjWithCaption."Object ID")) = 0 then begin
+                Clear(lJOEntity);
+                if not TableIdsList.Contains(lAllObjWithCaption."Object ID") then begin
                     this.GetTable('', lAllObjWithCaption."Object ID", lAllObjWithCaption."Object Name", lAllObjWithCaption."Object Caption", false, false, false, lJOEntity);
                     lJAEntities.Add(lJOEntity);
                 end;
@@ -45,7 +50,8 @@ codeunit 60001 "TPE Entity Management"
     begin
         pJOTable.Add('id', TableId);
         pJOTable.Add('name', TableName);
-        pJOTable.Add('entityCode', pEntityCode);
+        if pEntityCode <> '' then
+            pJOTable.Add('entityCode', pEntityCode);
         pJOTable.Add('caption', Caption);
         pJOTable.Add('insertAllowed', InsertAllowed);
         pJOTable.Add('modifyAllowed', ModifyAllowed);
@@ -131,9 +137,9 @@ codeunit 60001 "TPE Entity Management"
         lJOField.Add('id', pField."No.");
         lJOField.Add('name', pField.FieldName);
         lJOField.Add('caption', pField."Field Caption");
-        lJOField.Add('type', StrSubstNo(TechnicalOptionTxt, pField.Type));
+        lJOField.Add('type', StrSubstNo(this.TechnicalOptionTxt, pField.Type));
         lJOField.Add('length', pField.Len);
-        lJOField.Add('class', StrSubstNo(TechnicalOptionTxt, pField.Class));
+        lJOField.Add('class', StrSubstNo(this.TechnicalOptionTxt, pField.Class));
 
         if pField.Type = pField.Type::Option then
             lJOField.Add('optionMembers', pField.OptionString);
