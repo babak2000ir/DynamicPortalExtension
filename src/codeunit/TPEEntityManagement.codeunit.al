@@ -328,8 +328,8 @@ codeunit 60001 "TPE Entity Management"
         ModifyAllowed: Boolean;
         ModifyTriggerOnInsert: Boolean;
         ModifyTriggerOnModify: Boolean;
-        RenameAllowed: Boolean;
-        RenameTrigger: Boolean;
+        //RenameAllowed: Boolean;
+        //RenameTrigger: Boolean;
         lTableNo: Integer;
         lJAFieldValue: JsonArray;
     begin
@@ -341,8 +341,8 @@ codeunit 60001 "TPE Entity Management"
         ModifyTriggerOnModify := true;
         DeleteAllowed := true;
         DeleteTrigger := true;
-        RenameAllowed := true;
-        RenameTrigger := true;
+        //RenameAllowed := true;
+        //RenameTrigger := true;
 
         if lEntity.Get(this.GetEntityCode(pEntityCode)) then begin
             InsertAllowed := lEntity."Insert Allowed";
@@ -353,8 +353,8 @@ codeunit 60001 "TPE Entity Management"
             ModifyTriggerOnModify := lEntity."No Modify Trigger - Modify";
             DeleteAllowed := lEntity."Delete Allowed";
             DeleteTrigger := not lEntity."No Delete Trigger";
-            RenameAllowed := lEntity."Rename Allowed";
-            RenameTrigger := not lEntity."No Rename Trigger";
+            //RenameAllowed := lEntity."Rename Allowed";
+            //RenameTrigger := not lEntity."No Rename Trigger";
         end;
 
         lJAFieldValue.ReadFrom(pFieldValueArray);
@@ -398,81 +398,6 @@ codeunit 60001 "TPE Entity Management"
         end;
     end;
 
-    /* procedure SearchRelatedTableRecord(pEntityCode: Code[20]; pSearchTerm: Text): Text
-    var
-        Field: Record Field;
-        lRecordRef: RecordRef;
-        lFieldRef: FieldRef;
-        lSearchObject: JsonObject;
-        searchResult: Text;
-        lTableId: Integer;
-    begin
-        lTableId := this.GetTableId(pEntityCode);
-        lRecordRef.Open(lTableId);
-
-        Field.Reset();
-        Field.SetRange(TableNo, lTableId);
-        Field.SetRange(IsPartOfPrimaryKey, true);
-        Field.SetRange(field.ObsoleteState, field.ObsoleteState::No);
-        if Field.FindSet() then
-            repeat
-                lFieldRef := lRecordRef.Field(Field."No.");
-
-                lFieldRef.SetFilter(pSearchTerm);
-                if lRecordRef.FindSet(false) then begin
-                    lSearchObject.Add('value', Format(lFieldRef.Value));
-                    lSearchObject.WriteTo(searchResult);
-                    exit(searchResult);
-                end;
-
-                lFieldRef.SetFilter('*' + pSearchTerm);
-                if lRecordRef.FindSet(false) then begin
-                    lSearchObject.Add('value', Format(lFieldRef.Value));
-                    lSearchObject.WriteTo(searchResult);
-                    exit(searchResult);
-                end;
-
-                lFieldRef.SetFilter('*' + pSearchTerm + '*');
-                if lRecordRef.FindSet(false) then begin
-                    lSearchObject.Add('value', Format(lFieldRef.Value));
-                    lSearchObject.WriteTo(searchResult);
-                    exit(searchResult);
-                end;
-                lSearchObject.Add('error', 'No results found');
-                lSearchObject.WriteTo(searchResult);
-                exit(searchResult);
-            until Field.Next() = 0;
-    end; */
-
-    /* procedure LoginUser(pUserEmail: Text[250]; pPassword: Text[250]): Text
-    var
-        PortalUser: Record "TNP Portal User";
-        lJOData: JsonObject;
-        lJResult: Text;
-    begin
-
-        if not this.PortalUserMgmt.ValidatePasswordByEmail(pUserEmail, pPassword, PortalUser) then
-            error(this.UserNotFoundSecureErr);
-
-        lJOData.Add('userId', PortalUser."User ID");
-        lJOData.Add('fullName', PortalUser."Full Name");
-        lJOData.Add('phoneNo', PortalUser."Phone No.");
-
-        lJOData.WriteTo(lJResult);
-        exit(lJResult);
-    end; */
-
-    /* procedure SetPassword(pUserEmail: Text[250]; pPassword: Text[250]): Boolean
-    var
-        PortalUser: Record "TNP Portal User";
-    begin
-        if not PortalUser.FindUserByEmail(pUserEmail) then
-            error(this.UserNotFoundSecureErr);
-
-        this.PortalUserMgmt.CreatePassword(PortalUser, pPassword);
-        exit(true);
-    end; */
-
     #endregion Json Methods
     procedure GetFieldFilter(pEntityCode: Code[20]) FilterString: Text
     var
@@ -507,7 +432,7 @@ codeunit 60001 "TPE Entity Management"
         end;
 
         lEntityField.Reset();
-        lEntityField.SetRange("Entity Code", GetEntityCode(EntityCode));
+        lEntityField.SetRange("Entity Code", this.GetEntityCode(EntityCode));
         if lEntityField.FindSet() then
             repeat
                 if StrPos(FilterString, format(lEntityField."Field ID")) = 0 then begin
@@ -546,6 +471,7 @@ codeunit 60001 "TPE Entity Management"
     procedure InitSetKeys(pRecordRef: RecordRef; var pJAFieldValue: JsonArray)
     var
         Field: Record Field;
+        lFieldRef: FieldRef;
     begin
         //Init
         pRecordRef.Init();
@@ -557,7 +483,8 @@ codeunit 60001 "TPE Entity Management"
         Field.SetRange(field.ObsoleteState, field.ObsoleteState::No);
         if Field.FindSet() then
             repeat
-                this.FieldOp(enum::"Field Operation"::Validate, pRecordRef, Field."No.", pJAFieldValue);
+                lFieldRef := pRecordRef.Field(Field."No.");
+                lFieldRef.Validate(this.GetFieldValue(pRecordRef.RecordId.TableNo, Field, pJAFieldValue));
             until Field.Next() = 0;
     end;
 
@@ -565,6 +492,7 @@ codeunit 60001 "TPE Entity Management"
     var
         Field: Record Field;
         lEntityFields: Record "TNP Entity Field";
+        lFieldRef: FieldRef;
         lEntityCode: Code[20];
     begin
         lEntityCode := this.GetEntityCode(pEntityCode);
@@ -577,7 +505,8 @@ codeunit 60001 "TPE Entity Management"
             lEntityFields.SetRange("Read Only", false);
             if lEntityFields.FindSet() then
                 repeat
-                    this.FieldOp(Enum::"Field Operation"::Validate, pRecordRef, lEntityFields."Field ID", pJAFieldValue);
+                    lFieldRef := pRecordRef.Field(lEntityFields."Field ID");
+                    lFieldRef.Validate(this.GetFieldValue(pRecordRef.RecordId.TableNo, lEntityFields."Field ID", pJAFieldValue));
                 until lEntityFields.Next() = 0;
         end else begin
             Field.Reset();
@@ -586,148 +515,26 @@ codeunit 60001 "TPE Entity Management"
             Field.SetRange(field.ObsoleteState, field.ObsoleteState::No);
             if Field.FindSet() then
                 repeat
-                    this.FieldOp(enum::"Field Operation"::Validate, pRecordRef, Field."No.", pJAFieldValue);
+                    lFieldRef := pRecordRef.Field(Field."No.");
+                    lFieldRef.Validate(this.GetFieldValue(pRecordRef.RecordId.TableNo, Field, pJAFieldValue));
                 until Field.Next() = 0;
         end;
     end;
 
     procedure FilterFields(pRecordRef: RecordRef; var pJAFieldValue: JsonArray)
     var
-        field: Record Field;
+        Field: Record Field;
+        lFieldRef: FieldRef;
     begin
-        field.Reset();
-        field.SetRange(TableNo, pRecordRef.RecordId.TableNo);
-        field.SetRange(IsPartOfPrimaryKey, true);
-        field.SetRange(field.ObsoleteState, field.ObsoleteState::No);
-        if field.FindSet() then
+        Field.Reset();
+        Field.SetRange(TableNo, pRecordRef.RecordId.TableNo);
+        Field.SetRange(IsPartOfPrimaryKey, true);
+        Field.SetRange(field.ObsoleteState, field.ObsoleteState::No);
+        if Field.FindSet() then
             repeat
-                this.FieldOp(Enum::"Field Operation"::SetRange, pRecordRef, field."No.", pJAFieldValue);
-            until field.Next() = 0;
-    end;
-
-    local procedure FieldOp(Operation: Enum "Field Operation"; pRecordRef: RecordRef; pFieldId: Integer; pJAFieldValue: JsonArray)
-    var
-        lFieldRef: FieldRef;
-        lJTFieldValue: JsonToken;
-        typeQuery: Text;
-        valueQuery: Text;
-    begin
-        lFieldRef := pRecordRef.Field(pFieldId);
-        valueQuery := '[?(@.id==''' + Format(pFieldId) + ''')].value';
-        typeQuery := '[?(@.id==''' + Format(pFieldId) + ''')].type';
-
-        pJAFieldValue.SelectToken(valueQuery, lJTFieldValue);
-
-        case Operation of
-            Operation::Validate:
-                this.ValidateField(pJAFieldValue, lFieldRef, lJTFieldValue, typeQuery);
-            Operation::SetRange:
-                this.FilterField(pJAFieldValue, lFieldRef, lJTFieldValue, typeQuery);
-        end;
-    end;
-
-    local procedure ValidateField(var pJAFieldValue: JsonArray; var lFieldRef: FieldRef; lJTFieldValue: JsonToken; typeQuery: Text)
-    var
-        lJTFieldType: JsonToken;
-        optionIndex: Integer;
-    begin
-        if pJAFieldValue.SelectToken(typeQuery, lJTFieldType) then
-            case lJTFieldType.AsValue().AsText() of
-                'Text':
-                    lFieldRef.Validate(lJTFieldValue.AsValue().AsText());
-                'DateTime':
-                    lFieldRef.Validate(lJTFieldValue.AsValue().AsDateTime());
-                'Date':
-                    lFieldRef.Validate(lJTFieldValue.AsValue().AsDate());
-                'Time':
-                    lFieldRef.Validate(lJTFieldValue.AsValue().AsTime());
-                'Boolean':
-                    if (lFieldRef.Class = FieldClass::FlowField) then
-                        lFieldRef.CalcField()
-                    else
-                        lFieldRef.Validate(lJTFieldValue.AsValue().AsBoolean());
-                'Integer':
-                    lFieldRef.Validate(lJTFieldValue.AsValue().AsInteger());
-                'Decimal':
-                    lFieldRef.Validate(lJTFieldValue.AsValue().AsDecimal());
-                'Code':
-                    lFieldRef.Validate(lJTFieldValue.AsValue().AsCode());
-                'Option':
-                    begin
-                        optionIndex := lFieldRef.OptionMembers.Split(',').IndexOf(lJTFieldValue.AsValue().AsText());
-                        lFieldRef.Validate(optionIndex - 1);
-                    end;
-                'GUID':
-                    lFieldRef.Validate(lJTFieldValue.AsValue().AsByte());
-                else
-                    lFieldRef.Validate(lJTFieldValue.AsValue());
-            end;
-    end;
-
-    local procedure FilterField(var pJAFieldValue: JsonArray; var lFieldRef: FieldRef; lJTFieldValue: JsonToken; typeQuery: Text)
-    var
-        lJTFieldType: JsonToken;
-        optionValue: Integer;
-    begin
-        if pJAFieldValue.SelectToken(typeQuery, lJTFieldType) then
-            case lJTFieldType.AsValue().AsText() of
-                'Text':
-                    lFieldRef.setRange(lJTFieldValue.AsValue().AsText());
-                'DateTime':
-                    lFieldRef.setRange(lJTFieldValue.AsValue().AsDateTime());
-                'Date':
-                    lFieldRef.setRange(lJTFieldValue.AsValue().AsDate());
-                'Time':
-                    lFieldRef.setRange(lJTFieldValue.AsValue().AsTime());
-                'Boolean':
-                    if (lFieldRef.Class = FieldClass::FlowField) then
-                        lFieldRef.CalcField()
-                    else
-                        lFieldRef.setRange(lJTFieldValue.AsValue().AsBoolean());
-                'Integer':
-                    lFieldRef.setRange(lJTFieldValue.AsValue().AsInteger());
-                'Decimal':
-                    lFieldRef.setRange(lJTFieldValue.AsValue().AsDecimal());
-                'Code':
-                    lFieldRef.setRange(lJTFieldValue.AsValue().AsCode());
-                'Option':
-                    begin
-                        optionValue := lFieldRef.OptionMembers.Split(',').IndexOf(lJTFieldValue.AsValue().AsText());
-                        lFieldRef.setRange(optionValue - 1);
-                    end;
-                'GUID':
-                    lFieldRef.setRange(lJTFieldValue.AsValue().AsByte());
-                else
-                    lFieldRef.setRange(lJTFieldValue.AsValue());
-            end;
-    end;
-
-    local procedure FilterRecords(var pRecordRef: RecordRef; pFilterString: Text)
-    var
-        lFieldRef: FieldRef;
-        lCounter: Integer;
-        lfieldIdx: Integer;
-        lintValue: Integer;
-        lSplitFilter: List of [Text];
-        lValue: Text;
-    begin
-        lSplitFilter := pFilterString.Split(',');
-        for lCounter := 1 to lSplitFilter.Count / 2 do begin
-            lSplitFilter.Get(lCounter * 2 - 1, lValue);
-            Evaluate(lfieldIdx, lValue);
-            lSplitFilter.Get(lCounter * 2, lValue);
-            lFieldRef := pRecordRef.Field(lfieldIdx);
-
-            case lFieldRef.Type of
-                lfieldRef.Type::Option:
-                    begin
-                        lintValue := lFieldRef.OptionMembers.Split(',').IndexOf(lValue) - 1;
-                        lFieldRef.SetFilter('=%1', lintValue);
-                    end;
-                else
-                    lFieldRef.SetFilter('=%1', lValue);
-            end;
-        end;
+                lFieldRef := pRecordRef.Field(Field."No.");
+                lFieldRef.SetRange(this.GetFieldValue(pRecordRef.RecordId.TableNo, Field, pJAFieldValue));
+            until Field.Next() = 0;
     end;
 
     procedure IsPrimaryKey(TableNo: Integer; FieldNo: Integer): Boolean
@@ -774,5 +581,47 @@ codeunit 60001 "TPE Entity Management"
                 if lEntity.FindFirst() then
                     exit(lEntity."Entity Code");
             end;
+    end;
+
+    procedure GetFieldValue(pTableId: Integer; pFieldId: Integer; pJAFieldsValue: JsonArray): Variant
+    var
+        lField: Record Field;
+    begin
+        lField.Get(pTableId, pFieldId);
+        exit(this.GetFieldValue(pTableId, lField, pJAFieldsValue));
+    end;
+
+    procedure GetFieldValue(pTableId: Integer; pField: Record Field; pJAFieldsValue: JsonArray): Variant
+    var
+        lJTFieldValue: JsonToken;
+        ValueQuery: Text;
+    begin
+        valueQuery := '$.[?(@.id==''' + Format(pField."No.") + ''')].value';
+        pJAFieldsValue.SelectToken(valueQuery, lJTFieldValue);
+
+        case pField.Type of
+            pField.Type::Text:
+                exit(lJTFieldValue.AsValue().AsText());
+            pField.Type::DateTime:
+                exit(lJTFieldValue.AsValue().AsDateTime());
+            pField.Type::Date:
+                exit(lJTFieldValue.AsValue().AsDate());
+            pField.Type::Time:
+                exit(lJTFieldValue.AsValue().AsTime());
+            pField.Type::Boolean:
+                exit(lJTFieldValue.AsValue().AsBoolean());
+            pField.Type::Integer:
+                exit(lJTFieldValue.AsValue().AsInteger());
+            pField.Type::Decimal:
+                exit(lJTFieldValue.AsValue().AsDecimal());
+            pField.Type::Code:
+                exit(lJTFieldValue.AsValue().AsCode());
+            pField.Type::Option:
+                exit(pField.OptionString.Split(',').IndexOf(lJTFieldValue.AsValue().AsText()) - 1);
+            pField.Type::GUID:
+                exit(lJTFieldValue.AsValue().AsText());
+            else
+                exit(lJTFieldValue.AsValue().AsText());
+        end;
     end;
 }
