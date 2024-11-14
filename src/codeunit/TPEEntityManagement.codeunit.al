@@ -362,8 +362,8 @@ codeunit 60001 "TPE Entity Management"
         lTableNo := this.GetTableId(pEntityCode);
         lRecordRef.Open(lTableNo);
 
-        case Activity of
-            'Insert':
+        case LowerCase(Activity) of
+            'insert':
                 begin
                     if not InsertAllowed then Error('Insert not allowed for %1', pEntityCode);
 
@@ -379,7 +379,7 @@ codeunit 60001 "TPE Entity Management"
                     else
                         lRecordRef.Insert(InsertTrigger);
                 end;
-            'Modify':
+            'modify':
                 begin
                     if not ModifyAllowed then Error('Modify not allowed for %1', pEntityCode);
 
@@ -388,7 +388,7 @@ codeunit 60001 "TPE Entity Management"
                     this.ValidateFields(lRecordRef, pEntityCode, lJAFieldValue);
                     lRecordRef.Modify(ModifyTriggerOnModify);
                 end;
-            'Delete':
+            'delete':
                 begin
                     if not DeleteAllowed then Error('Delete not allowed for %1', pEntityCode);
 
