@@ -166,7 +166,7 @@ codeunit 60001 "TPE Entity Management"
         exit(lJOField);
     end;
 
-    procedure GetEntityData(pEntityCode: Code[20]; pView: Text; pPageSize: Integer; pPageIndex: Integer) JOResult: JsonObject
+    procedure GetEntityRecords(pEntityCode: Code[20]; pView: Text; pPageSize: Integer; pPageIndex: Integer) JOResult: JsonObject
     var
         lPageCount: Integer;
         lJARecords: JsonArray;
@@ -180,6 +180,25 @@ codeunit 60001 "TPE Entity Management"
 
         lJOData.Add('paging', lJAPaging);
         lJOData.Add('records', lJARecords);
+        if pEntityCode <> '' then
+            lJOData.Add('entityCode', this.GetEntityCode(pEntityCode));
+
+        JOResult.Add('data', lJOData);
+    end;
+
+    procedure GetEntityRecord(pEntityCode: Code[20]; pKeyFieldsValue: Text) JOResult: JsonObject
+    var
+        lJARecord: JsonArray;
+        lJOData: JsonObject;
+        lPageCount: Integer;
+    begin
+        //TODO - Check if all table keys are provided
+        this.GetEntityRecords(pEntityCode, pKeyFieldsValue, lJARecord, 2, 1, lPageCount);
+
+        if lJARecord.Count > 1 then
+            Error('Multiple records found for the provided key fields.');
+
+        lJOData.Add('record', lJARecord);
         if pEntityCode <> '' then
             lJOData.Add('entityCode', this.GetEntityCode(pEntityCode));
 
@@ -393,9 +412,16 @@ codeunit 60001 "TPE Entity Management"
                     if not DeleteAllowed then Error('Delete not allowed for %1', pEntityCode);
 
                     this.FilterFields(lRecordRef, lJAFieldValue);
-                    lRecordRef.Delete(DeleteTrigger);
+                    if lRecordRef.Count() > 1 then
+                        Error('Multiple records found for delete. Please provide primary key values')
+                    else begin
+                        lRecordRef.FindFirst();
+                        lRecordRef.Delete(DeleteTrigger);
+                    end;
                 end;
         end;
+
+        //TODO - Return the record after insert/modify/delete
     end;
 
     #endregion Json Methods
