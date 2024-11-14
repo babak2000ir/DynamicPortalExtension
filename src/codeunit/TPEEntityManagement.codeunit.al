@@ -176,9 +176,12 @@ codeunit 60001 "TPE Entity Management"
 
         lJAPaging.Add('pageIndex', pPageIndex);
         lJAPaging.Add('pageCount', lPageCount);
+        lJAPaging.Add('pageSize', pPageSize);
 
         lJOData.Add('paging', lJAPaging);
         lJOData.Add('records', lJARecords);
+        if pEntityCode <> '' then
+            lJOData.Add('entityCode', this.GetEntityCode(pEntityCode));
 
         JOResult.Add('data', lJOData);
     end;
@@ -504,7 +507,7 @@ codeunit 60001 "TPE Entity Management"
         end;
 
         lEntityField.Reset();
-        lEntityField.SetRange("Entity Code", EntityCode);
+        lEntityField.SetRange("Entity Code", GetEntityCode(EntityCode));
         if lEntityField.FindSet() then
             repeat
                 if StrPos(FilterString, format(lEntityField."Field ID")) = 0 then begin
