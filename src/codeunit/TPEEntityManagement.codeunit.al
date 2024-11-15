@@ -174,33 +174,43 @@ codeunit 60001 "TPE Entity Management"
     begin
         this.GetEntityRecords(pEntityCode, pView, lJARecords, pPageSize, pPageIndex, lPageCount);
 
+        if pEntityCode <> '' then
+            lJOData.Add('entityCode', this.GetEntityCode(pEntityCode));
+
         lJAPaging.Add('pageIndex', pPageIndex);
         lJAPaging.Add('pageCount', lPageCount);
         lJAPaging.Add('pageSize', pPageSize);
 
         lJOData.Add('paging', lJAPaging);
         lJOData.Add('records', lJARecords);
-        if pEntityCode <> '' then
-            lJOData.Add('entityCode', this.GetEntityCode(pEntityCode));
+
 
         JOResult.Add('data', lJOData);
     end;
 
     procedure GetEntityRecord(pEntityCode: Code[20]; pKeyFieldsValue: Text) JOResult: JsonObject
     var
-        lJARecord: JsonArray;
+        lJARecords: JsonArray;
+        lJORecord: JsonObject;
+        lJToken: JsonToken;
         lJOData: JsonObject;
         lPageCount: Integer;
     begin
         //TODO - Check if all table keys are provided
-        this.GetEntityRecords(pEntityCode, pKeyFieldsValue, lJARecord, 2, 1, lPageCount);
+        this.GetEntityRecords(pEntityCode, pKeyFieldsValue, lJARecords, 2, 1, lPageCount);
 
-        if lJARecord.Count > 1 then
+        if lJARecords.Count > 1 then
             Error('Multiple records found for the provided key fields.');
 
-        lJOData.Add('record', lJARecord);
         if pEntityCode <> '' then
             lJOData.Add('entityCode', this.GetEntityCode(pEntityCode));
+
+        if lJARecords.Count = 0 then
+            exit;
+
+        lJARecords.Get(0, lJToken);
+        lJORecord := lJToken.AsObject();
+        lJOData.Add('record', lJORecord);
 
         JOResult.Add('data', lJOData);
     end;
@@ -222,21 +232,6 @@ codeunit 60001 "TPE Entity Management"
         lRecordRef.Open(lTableId);
         if pView <> '' then
             lRecordRef.SetView(pView);
-
-        // Filter BY RelationFilter Field ID
-        /* if lJFilterValue.ReadFrom(pFilterParams) then
-            if lJFilterValue.Count > 0 then begin
-                lEntityRelationFilter.Reset();
-                lEntityRelationFilter.SetRange("Entity Code", pRelatedEntityCode);
-                lEntityRelationFilter.SetRange("Related Table ID", lTableId);
-                if lEntityRelationFilter.FindSet() then
-                    repeat
-                        lFieldRef := lRecordRef.Field(lEntityRelationFilter."Related Table Field ID");
-                        valueQuery := '[?(@.id==''' + Format(lEntityRelationFilter."Related Table Field ID") + ''')].value';
-                        lJFilterValue.SelectToken(valueQuery, lJTFieldValue);
-                        lFieldRef.SetFilter(lJTFieldValue.AsValue().AsText());
-                    until lEntityRelationFilter.Next() = 0;
-            end; */
 
         lRecordCount := lRecordRef.Count();
         pPageCount := (lRecordCount div pPageSize);
