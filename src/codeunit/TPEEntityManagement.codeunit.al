@@ -248,7 +248,7 @@ codeunit 60001 "TPE Entity Management"
                 repeat
                     pJARecords.Add(this.GetEntityFieldValues(pEntityCode, lRecordRef));
                     lintCounter += 1;
-                until (lRecordRef.Next() = 0) or (lintCounter > pPageSize + 1);
+                until (lRecordRef.Next() = 0) or (lintCounter > pPageSize);
         if pPageIndex = 1 then
             repeat
                 pJARecords.Add(this.GetEntityFieldValues(pEntityCode, lRecordRef));
