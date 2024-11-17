@@ -199,8 +199,8 @@ codeunit 60001 "TPE Entity Management"
         //TODO - Check if all table keys are provided
         this.GetEntityRecords(pEntityCode, pKeyFieldsValue, lJARecords, 2, 1, lPageCount);
 
-        if lJARecords.Count > 1 then
-            Error('Multiple records found for the provided key fields.');
+        //if lJARecords.Count > 1 then
+        //    Error('Multiple records found for the provided key fields.');
 
         if pEntityCode <> '' then
             lJOData.Add('entityCode', this.GetEntityCode(pEntityCode));
