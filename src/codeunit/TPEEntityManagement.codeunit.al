@@ -646,7 +646,7 @@ codeunit 60001 "TPE Entity Management"
         lJTFieldValue: JsonToken;
         ValueQuery: Text;
     begin
-        valueQuery := '$.[?(@.id==''' + Format(pField."No.") + ''')].value';
+        valueQuery := '$.[?(@.id==' + Format(pField."No.") + ')].value';
         if pJAFieldsValue.SelectToken(valueQuery, lJTFieldValue) then begin
             case pField.Type of
                 pField.Type::Text:
