@@ -13,9 +13,9 @@ codeunit 60000 "TPE Entity Web Service"
         this.EntityManagement.GetEntityRecords(pEntityCode, pView, pPageSize, pPageIndex).WriteTo(Result);
     end;
 
-    procedure GetEntityRecord(pEntityCode: Code[20]; pKeyFieldsValue: Text) Result: Text
+    procedure GetEntityRecord(pEntityCode: Code[20]; pKeyFieldsView: Text) Result: Text
     begin
-        this.EntityManagement.GetEntityRecord(pEntityCode, pKeyFieldsValue).WriteTo(Result);
+        this.EntityManagement.GetEntityRecord(pEntityCode, pKeyFieldsView).WriteTo(Result);
     end;
 
     procedure EntityAmend(pEntityCode: code[20]; pAmendType: Text; pRecord: Text)

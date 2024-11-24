@@ -188,7 +188,7 @@ codeunit 60001 "TPE Entity Management"
         JOResult.Add('data', lJOData);
     end;
 
-    procedure GetEntityRecord(pEntityCode: Code[20]; pKeyFieldsValue: Text) JOResult: JsonObject
+    procedure GetEntityRecord(pEntityCode: Code[20]; pKeyFieldsView: Text) JOResult: JsonObject
     var
         lJARecords: JsonArray;
         lJARecord: JsonArray;
@@ -197,7 +197,7 @@ codeunit 60001 "TPE Entity Management"
         lPageCount: Integer;
     begin
         //TODO - Check if all table keys are provided
-        this.GetEntityRecords(pEntityCode, pKeyFieldsValue, lJARecords, 2, 1, lPageCount);
+        this.GetEntityRecords(pEntityCode, pKeyFieldsView, lJARecords, 2, 1, lPageCount);
 
         //if lJARecords.Count > 1 then
         //    Error('Multiple records found for the provided key fields.');
